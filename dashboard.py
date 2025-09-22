@@ -9,6 +9,9 @@ Original file is located at
 
 import streamlit as st
 import pandas as pd
+# Fix matplotlib import untuk Streamlit
+import matplotlib
+matplotlib.use('Agg')  # Gunakan backend non-interactive
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -71,7 +74,9 @@ if uploaded_file:
                 season_usage.plot(kind="bar", ax=ax, color="skyblue")
                 ax.set_ylabel("Rata-rata Jumlah Sewa")
                 ax.set_xlabel("Musim")
+                plt.tight_layout()  # Tambahkan ini untuk layout yang lebih baik
                 st.pyplot(fig)
+                plt.close()  # Tutup figure untuk menghindari memory leak
 
     with col2:
         st.subheader("Rata-rata Penggunaan per Cuaca")
@@ -83,7 +88,9 @@ if uploaded_file:
                 weather_usage.plot(kind="bar", ax=ax, color="lightcoral")
                 ax.set_ylabel("Rata-rata Jumlah Sewa")
                 ax.set_xlabel("Kondisi Cuaca")
+                plt.tight_layout()
                 st.pyplot(fig)
+                plt.close()
 
     # --- Pertanyaan 2 ---
     st.header("❓ Pertanyaan 2: Perbedaan Pola Weekday vs Weekend")
@@ -101,7 +108,9 @@ if uploaded_file:
         ax.set_xlabel("Jam")
         ax.set_ylabel("Rata-rata Jumlah Sewa")
         ax.legend()
+        plt.tight_layout()
         st.pyplot(fig)
+        plt.close()
 
         st.subheader("Rata-rata Penggunaan Weekday vs Weekend")
         day_usage = df_filtered.groupby("workingday")["cnt"].mean()
@@ -110,7 +119,9 @@ if uploaded_file:
             fig, ax = plt.subplots()
             day_usage.plot(kind="bar", ax=ax, color=["lightgreen", "orange"])
             ax.set_ylabel("Rata-rata Jumlah Sewa")
+            plt.tight_layout()
             st.pyplot(fig)
+            plt.close()
 
     # --- Analisis tambahan ---
     st.header("📌 Analisis Tambahan: Heatmap Korelasi")
@@ -119,7 +130,9 @@ if uploaded_file:
         corr = numeric_df.corr()
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.heatmap(corr, annot=True, cmap="coolwarm", center=0, ax=ax)
+        plt.tight_layout()
         st.pyplot(fig)
+        plt.close()
 
     # --- Kesimpulan ---
     st.header("📝 Kesimpulan & Rekomendasi")
