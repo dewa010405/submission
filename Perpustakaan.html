@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Peminjaman Buku Perpustakaan Kampus</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1e40af;
+      --secondary: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --card-bg: #ffffff;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+      color: var(--dark); 
+      min-height: 100vh;
+    }
+    
+    header { 
+      background: linear-gradient(to right, var(--primary-dark), var(--primary)); 
+      color: white; 
+      padding: 20px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 0 20px;
+    }
+    
+    .header-flex { 
+      display: flex; 
+      flex-wrap: wrap; 
+      justify-content: space-between; 
+      align-items: center; 
+      gap: 15px; 
+    }
+    
+    .logo { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+    }
+    
+    .logo i { 
+      font-size: 28px; 
+    }
+    
+    .search-box { 
+      padding: 12px 16px; 
+      width: 300px; 
+      border-radius: 50px; 
+      border: none; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      font-size: 14px;
+    }
+    
+    .btn { 
+      padding: 10px 18px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary { 
+      background: var(--primary); 
+      color: white; 
+    }
+    
+    .btn-primary:hover { 
+      background: var(--primary-dark); 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-secondary { 
+      background: var(--light); 
+      color: var(--dark); 
+      border: 1px solid #cbd5e1;
+    }
+    
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    
+    .btn-info { 
+      background: var(--secondary); 
+      color: white; 
+    }
+    
+    .btn-disabled { 
+      background: #e5e7eb; 
+      color: #9ca3af; 
+      cursor: not-allowed; 
+    }
+    
+    main { 
+      padding: 30px 0; 
+    }
+    
+    .grid { 
+      display: grid; 
+      grid-template-columns: 2fr 1fr; 
+      gap: 25px; 
+    }
+    
+    .card { 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      padding: 20px; 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08); 
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .books { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Lebar card buku diperbesar */
+      gap: 20px; 
+    }
+    
+    .book { 
+      border: 1px solid #e2e8f0; 
+      border-radius: 12px; 
+      padding: 16px; 
+      display: flex; 
+      gap: 15px; 
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .book:hover {
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+      border-color: var(--primary);
+    }
+    
+    .cover { 
+      width: 70px; 
+      height: 100px; 
+      background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%); 
+      border-radius: 8px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 12px; 
+      color: var(--primary-dark); 
+      text-align: center; 
+      flex-shrink: 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .badge { 
+      padding: 6px 12px; 
+      border-radius: 50px; 
+      font-size: 12px; 
+      font-weight: 600;
+    }
+    
+    .available { 
+      background: #d1fae5; 
+      color: #065f46; 
+    }
+    
+    .borrowed { 
+      background: #fee2e2; 
+      color: #991b1b; 
+    }
+    
+    .book-actions { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-top: 12px; 
+    }
+    
+    .book-buttons { 
+      display: flex; 
+      gap: 8px; 
+    }
+    
+    .stats {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card i {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--secondary);
+    }
+
+    .modal { 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.5); 
+      display: none; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content { 
+      background: white; 
+      padding: 25px; 
+      border-radius: 16px; 
+      width: 100%; 
+      max-width: 450px; 
+      box-shadow: 0 20px 25px rgba(0,0,0,0.2);
+      animation: modalAppear 0.3s ease;
+    }
+    
+    @keyframes modalAppear {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .modal-wide { 
+      max-width: 550px; 
+    }
+    
+    .form-group { 
+      margin-bottom: 16px; 
+    }
+    
+    .form-group label { 
+      font-size: 14px; 
+      display: block; 
+      margin-bottom: 6px; 
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    .form-group input, select { 
+      width: 100%; 
+      padding: 12px; 
+      border-radius: 8px; 
+      border: 1px solid #cbd5e1; 
+      font-size: 14px;
+      transition: border 0.3s;
+    }
+    
+    .form-group input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .error { 
+      color: var(--danger); 
+      font-size: 14px; 
+      margin-bottom: 12px; 
+      padding: 10px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border-left: 4px solid var(--danger);
+    }
+    
+    .book-detail { 
+      margin-top: 15px; 
+      padding: 15px; 
+      background: #f8fafc; 
+      border-radius: 8px; 
+      line-height: 1.6;
+    }
+    
+    h2 {
+      color: var(--dark);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+    }
+    
+    /* Gaya untuk form yang dapat di-scroll */
+    .modal-form-container {
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    /* Gaya scrollbar untuk form */
+    .modal-form-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .modal-form-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .modal-form-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    .modal-form-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Gaya untuk container pencarian dan filter */
+    .search-filter-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .header-flex {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .search-filter-container {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .search-box {
+        width: 100%;
+      }
+      
+      .stats {
+        flex-direction: column;
+      }
+      
+      .books {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container header-flex">
+    <div class="logo">
+      <i class="fas fa-book-open"></i>
+      <div>
+        <h1>Perpustakaan Kampus</h1>
+        <p>Sistem Peminjaman Buku</p>
+      </div>
+    </div>
+    <div class="search-filter-container">
+      <input id="search" type="text" class="search-box" placeholder="Cari judul / penulis / ISBN..." />
+      <button id="filterBtn" class="btn btn-secondary">
+        <i class="fas fa-filter"></i>
+        <span>Semua Buku</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="stats">
+      <div class="stat-card">
+        <i class="fas fa-book"></i>
+        <div class="stat-value" id="totalBooks">0</div>
+        <div class="stat-label">Total Buku</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-check-circle"></i>
+        <div class="stat-value" id="availableBooks">0</div>
+        <div class="stat-label">Tersedia</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div class="stat-value" id="totalLoans">0</div>
+        <div class="stat-label">Dipinjam</div>
+      </div>
+    </div>
+    
+    <div class="grid">
+      <!-- KOLOM KIRI: KATALOG -->
+      <div class="card">
+        <h2><i class="fas fa-list"></i> Katalog Buku</h2>
+        <div id="bookList" class="books"></div>
+      </div>
+
+      <!-- KOLOM KANAN: INFO -->
+      <div>
+        <div class="card" style="margin-bottom: 20px;">
+          <h3><i class="fas fa-info-circle"></i> Info Perpustakaan</h3>
+          <p><i class="fas fa-clock"></i> Jam buka: Senin - Jumat, 08:00 - 16:00</p>
+          <p><i class="fas fa-map-marker-alt"></i> Lokasi: Gedung Perpustakaan Lantai 1</p>
+          <p><i class="fas fa-phone"></i> Telepon: (021) 1234-5678</p>
+        </div>
+        
+        <div class="card">
+          <h3><i class="fas fa-bullhorn"></i> Pengumuman</h3>
+          <p>• Masa pengembalian buku maksimal 7 hari</p>
+          <p>• Denda keterlambatan Rp 2.000/hari</p>
+          <p>• Buku referensi tidak dapat dipinjam</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL PINJAM -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle"><i class="fas fa-book"></i> Pinjam Buku</h3>
+    <div id="error" class="error"></div>
+
+    <!-- Container untuk form yang dapat di-scroll -->
+    <div class="modal-form-container">
+      <div class="form-group">
+        <label>Nama Peminjam</label>
+        <input id="borrowerName" type="text" />
+      </div>
+      <div class="form-group">
+        <label>NPM</label>
+        <input id="borrowerNpm" type="text" />
+      </div>
+      <div class="form-group">
+        <label>Jurusan</label>
+        <input id="borrowerDept" type="text" />
+      </div>
+      <div class="form-group">
+        <label>Jenis Kelamin</label>
+        <select id="borrowerGender">
+          <option value="">-- Pilih Jenis Kelamin --</option>
+          <option value="Laki-laki">Laki-laki</option>
+          <option value="Perempuan">Perempuan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>No WhatsApp</label>
+        <input id="borrowerWa" type="text" />
+      </div>
+      <div class="form-group">
+        <label>Tanggal Peminjaman</label>
+        <input id="borrowDate" type="date" />
+      </div>
+      <div class="form-group">
+        <label>Durasi (hari)</label>
+        <input id="borrowDays" type="number" value="7" />
+      </div>
+    </div>
+
+    <div style="text-align:right; margin-top: 20px;">
+      <button class="btn btn-secondary" onclick="closeModal()">
+        <i class="fas fa-times"></i> Batal
+      </button>
+      <button class="btn btn-primary" onclick="confirmBorrow()">
+        <i class="fas fa-check"></i> Konfirmasi
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div id="detailModal" class="modal">
+  <div class="modal-content modal-wide">
+    <h3 id="detailTitle"><i class="fas fa-info-circle"></i> Detail Buku</h3>
+    <div id="bookDetailContent"></div>
+    <div style="text-align:right; margin-top: 20px;">
+      <button class="btn btn-secondary" onclick="closeDetailModal()">
+        <i class="fas fa-times"></i> Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Kode JavaScript tetap sama seperti sebelumnya
+  let books = [];
+  let loans = [];
+  let selectedBook = null;
+  let filterAvailable = false;
+
+  const bookList = document.getElementById('bookList');
+  const searchInput = document.getElementById('search');
+  const filterBtn = document.getElementById('filterBtn');
+
+  function loadBooks() {
+    books = JSON.parse(localStorage.getItem('books')) || [];
+    updateStats();
+  }
+
+  function loadLoans() {
+    loans = JSON.parse(localStorage.getItem('loans')) || [];
+    updateStats();
+  }
+
+  function saveBooks() {
+    localStorage.setItem('books', JSON.stringify(books));
+    updateStats();
+  }
+
+  function saveLoans() {
+    localStorage.setItem('loans', JSON.stringify(loans));
+    updateStats();
+  }
+
+  function updateStats() {
+    document.getElementById('totalBooks').textContent = books.length;
+    document.getElementById('availableBooks').textContent = books.filter(b => b.stock > 0).length;
+    document.getElementById('totalLoans').textContent = loans.length;
+  }
+
+  function renderBooks() {
+    const q = searchInput.value.toLowerCase();
+    bookList.innerHTML = '';
+
+    const filtered = books.filter(b => {
+      const match = b.title.toLowerCase().includes(q) ||
+                    b.author.toLowerCase().includes(q) ||
+                    b.isbn.toLowerCase().includes(q);
+      return filterAvailable ? match && b.stock > 0 : match;
+    });
+
+    if (filtered.length === 0) {
+      bookList.innerHTML = '<p style="text-align:center; padding:20px; color:#64748b;">Tidak ada buku ditemukan.</p>';
+      return;
+    }
+
+    filtered.forEach(book => {
+      const div = document.createElement('div');
+      div.className = 'book';
+      div.innerHTML = `
+        <div class="cover">
+          <i class="fas fa-book" style="font-size:24px;"></i>
+        </div>
+        <div style="flex:1;">
+          <h4>${book.title}</h4>
+          <p><i class="fas fa-user"></i> ${book.author}</p>
+          <p><i class="fas fa-barcode"></i> ISBN: ${book.isbn}</p>
+          <p><i class="fas fa-layer-group"></i> Stok: ${book.stock}</p>
+          <div class="book-actions">
+            <span class="badge ${book.stock > 0 ? 'available' : 'borrowed'}">
+              ${book.stock > 0 ? '<i class="fas fa-check"></i> Tersedia' : '<i class="fas fa-times"></i> Dipinjam'}
+            </span>
+            <div class="book-buttons">
+              <button class="btn btn-info" onclick="showBookDetail(${book.id})">
+                <i class="fas fa-eye"></i> Detail
+              </button>
+              <button class="btn ${book.stock > 0 ? 'btn-primary' : 'btn-disabled'}"
+                ${book.stock > 0 ? '' : 'disabled'}
+                onclick="openModal(${book.id})">
+                <i class="fas fa-hand-holding"></i> Pinjam
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      bookList.appendChild(div);
+    });
+  }
+
+  function openModal(id) {
+    selectedBook = books.find(b => b.id === id);
+    document.getElementById('modalTitle').textContent = `Pinjam: ${selectedBook.title}`;
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('error').textContent = '';
+    
+    // Set tanggal hari ini sebagai default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('borrowDate').value = today;
+  }
+
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+
+  function showBookDetail(id) {
+    const book = books.find(b => b.id === id);
+
+    document.getElementById('detailTitle').textContent = `Detail: ${book.title}`;
+    document.getElementById('bookDetailContent').innerHTML = `
+      <p><strong><i class="fas fa-user"></i> Penulis:</strong> ${book.author}</p>
+      <p><strong><i class="fas fa-barcode"></i> ISBN:</strong> ${book.isbn}</p>
+      <p><strong><i class="fas fa-layer-group"></i> Stok:</strong> ${book.stock}</p>
+      <div class="book-detail">${book.description}</div>
+    `;
+
+    document.getElementById('detailModal').style.display = 'flex';
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detailModal').style.display = 'none';
+  }
+
+  function confirmBorrow() {
+    const name = borrowerName.value.trim();
+    const npm = borrowerNpm.value.trim();
+    const dept = borrowerDept.value.trim();
+    const gender = borrowerGender.value;
+    const wa = borrowerWa.value.trim();
+    const borrowDate = borrowDateInput.value;
+    const days = parseInt(borrowDays.value);
+
+    if (!name || !npm || !dept || !gender || !wa || !borrowDate) {
+      document.getElementById('error').textContent = "Semua data harus diisi!";
+      return;
+    }
+
+    selectedBook.stock -= 1;
+    saveBooks();
+
+    const due = new Date();
+    due.setDate(due.getDate() + days);
+
+    loans.push({
+      title: selectedBook.title,
+      borrower: name,
+      npm,
+      dept,
+      gender,
+      wa,
+      borrowDate,
+      dueDate: due.toISOString().split('T')[0]
+    });
+
+    saveLoans();
+    closeModal();
+    renderBooks();
+  }
+
+  filterBtn.onclick = () => {
+    filterAvailable = !filterAvailable;
+    filterBtn.innerHTML = filterAvailable ? 
+      '<i class="fas fa-filter"></i> Tersedia' : 
+      '<i class="fas fa-filter"></i> Semua Buku';
+    renderBooks();
+  };
+
+  searchInput.oninput = renderBooks;
+
+  const borrowerName = document.getElementById('borrowerName');
+  const borrowerNpm = document.getElementById('borrowerNpm');
+  const borrowerDept = document.getElementById('borrowerDept');
+  const borrowerGender = document.getElementById('borrowerGender');
+  const borrowerWa = document.getElementById('borrowerWa');
+  const borrowDateInput = document.getElementById('borrowDate');
+  const borrowDays = document.getElementById('borrowDays');
+
+  // Set tanggal hari ini sebagai default
+  const today = new Date().toISOString().split('T')[0];
+  borrowDateInput.value = today;
+
+  loadBooks();
+  loadLoans();
+  renderBooks();
+</script>
+
+</body>
+</html>
